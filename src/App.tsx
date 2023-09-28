@@ -109,46 +109,49 @@ const App: React.FC = () => {
     return kanjiNum;
   };
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    switch (e.key) {
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-      case "0":
-        setInput((prev) => prev + e.key);
-        break;
-      case "Enter":
-        e.preventDefault();
-        evaluateExpression();
-        break;
-      case " ":
-        e.preventDefault();
-        clearInput();
-        break;
-      case "+":
-      case "-":
-      case "/":
-      case "*":
-        setInput((prev) => prev + e.key);
-        break;
-      case "Backspace":
-      case "Delete":
-        setInput((prev) => {
-          const updatedValue = prev.slice(0, -1);
-          setKanjiResult(toKanjiNumber(parseFloat(updatedValue))); // これを追加
-          return updatedValue;
-        });
-        break;
-      default:
-        break;
-    }
-  }, [evaluateExpression, toKanjiNumber]); 
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+        case "0":
+          setInput((prev) => prev + e.key);
+          break;
+        case "Enter":
+          e.preventDefault();
+          evaluateExpression();
+          break;
+        case " ":
+          e.preventDefault();
+          clearInput();
+          break;
+        case "+":
+        case "-":
+        case "/":
+        case "*":
+          setInput((prev) => prev + e.key);
+          break;
+        case "Backspace":
+        case "Delete":
+          setInput((prev) => {
+            const updatedValue = prev.slice(0, -1);
+            setKanjiResult(toKanjiNumber(parseFloat(updatedValue))); // これを追加
+            return updatedValue;
+          });
+          break;
+        default:
+          break;
+      }
+    },
+    [evaluateExpression, toKanjiNumber]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
