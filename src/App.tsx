@@ -29,7 +29,52 @@ const App: React.FC = () => {
     setInput((prev) => prev + value);
   };
 
-  const evaluateExpression = () => {
+  const clearInput = () => {
+    setInput("");
+    setKanjiResult("");
+  };
+
+  const formatNumberWithCommas = (x: string) => {
+    const parts = x.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+  };
+
+  const formatWithCommas = (x: number): string => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const toKanjiNumber = useCallback(
+    (num: number, recursive = false): string => {
+      if (num < 10000 && !recursive) return formatWithCommas(num);
+
+      let kanjiNum = "";
+
+      for (const { unit, power } of kanjiUnits.slice().reverse()) {
+        const divisor = 10 ** power;
+        const value = Math.floor(num / divisor);
+
+        if (value > 0) {
+          kanjiNum +=
+            (value < 10000 || power === 4
+              ? formatWithCommas(value)
+              : toKanjiNumber(value, true)) + unit;
+          num -= value * divisor; // ここを変更
+        }
+      }
+
+      if (num > 0 && kanjiNum) {
+        kanjiNum += formatWithCommas(num);
+      } else if (num > 0) {
+        kanjiNum = formatWithCommas(num);
+      }
+
+      return kanjiNum;
+    },
+    []
+  );
+
+  const evaluateExpression = useCallback(() => {
     // 正規表現で数字と演算子を分ける
     const regex = /([+\-*/])|([\d.]+)/g;
     const tokens = input.match(regex);
@@ -65,49 +110,7 @@ const App: React.FC = () => {
     }
     setInput(result.toString());
     setKanjiResult(toKanjiNumber(result));
-  };
-
-  const clearInput = () => {
-    setInput("");
-    setKanjiResult("");
-  };
-
-  const formatNumberWithCommas = (x: string) => {
-    const parts = x.split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return parts.join(".");
-  };
-
-  const formatWithCommas = (x: number): string => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  const toKanjiNumber = (num: number, recursive = false): string => {
-    if (num < 10000 && !recursive) return formatWithCommas(num);
-
-    let kanjiNum = "";
-
-    for (const { unit, power } of kanjiUnits.slice().reverse()) {
-      const divisor = 10 ** power;
-      const value = Math.floor(num / divisor);
-
-      if (value > 0) {
-        kanjiNum +=
-          (value < 10000 || power === 4
-            ? formatWithCommas(value)
-            : toKanjiNumber(value, true)) + unit;
-        num -= value * divisor; // ここを変更
-      }
-    }
-
-    if (num > 0 && kanjiNum) {
-      kanjiNum += formatWithCommas(num);
-    } else if (num > 0) {
-      kanjiNum = formatWithCommas(num);
-    }
-
-    return kanjiNum;
-  };
+  }, [input, toKanjiNumber]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
