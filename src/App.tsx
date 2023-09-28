@@ -9,39 +9,41 @@ const App: React.FC = () => {
   };
 
   const evaluateExpression = () => {
-    const operators = ["+", "-", "*", "/"];
-    let operator;
-    for (let op of operators) {
-      if (input.includes(op)) {
-        operator = op;
-        break;
+    // 正規表現で数字と演算子を分ける
+    const regex = /([+\-*/])|([\d.]+)/g;
+    const tokens = input.match(regex);
+  
+    if (!tokens) return;
+  
+    let result = parseFloat(tokens[0]);
+    for (let i = 1; i < tokens.length; i += 2) {
+      const operator = tokens[i];
+      const nextValue = parseFloat(tokens[i + 1]);
+  
+      switch (operator) {
+        case "+":
+          result += nextValue;
+          break;
+        case "-":
+          result -= nextValue;
+          break;
+        case "*":
+          result *= nextValue;
+          break;
+        case "/":
+          if (nextValue === 0) {
+            setInput("エラー");
+            return;
+          }
+          result /= nextValue;
+          break;
+        default:
+          setInput("エラー");
+          return;
       }
     }
-    if (!operator) return;
-
-    const [left, right] = input.split(operator);
-    switch (operator) {
-      case "+":
-        setInput((parseFloat(left) + parseFloat(right)).toString());
-        break;
-      case "-":
-        setInput((parseFloat(left) - parseFloat(right)).toString());
-        break;
-      case "*":
-        setInput((parseFloat(left) * parseFloat(right)).toString());
-        break;
-      case "/":
-        setInput(
-          (parseFloat(right) !== 0
-            ? parseFloat(left) / parseFloat(right)
-            : "エラー"
-          ).toString()
-        );
-        break;
-      default:
-        setInput("エラー");
-    }
-  };
+    setInput(result.toString());
+  };  
 
   const clearInput = () => {
     setInput("");
