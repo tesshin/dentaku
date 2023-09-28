@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
 
 const kanjiUnits = [
@@ -109,7 +109,7 @@ const App: React.FC = () => {
     return kanjiNum;
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     switch (e.key) {
       case "1":
       case "2":
@@ -148,7 +148,7 @@ const App: React.FC = () => {
       default:
         break;
     }
-  };
+  }, [input]); 
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
