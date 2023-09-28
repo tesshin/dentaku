@@ -148,7 +148,7 @@ const App: React.FC = () => {
       default:
         break;
     }
-  }, [input]); 
+  }, [input, evaluateExpression, toKanjiNumber]); 
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
